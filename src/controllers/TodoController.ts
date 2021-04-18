@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import Todo from '../models/Todo';
 
 class TodoController {
   async store(req: any, res: any) {
@@ -12,7 +13,9 @@ class TodoController {
       return res.status(400).json({ error: 'You must provide: Content, Date and User Id' });
     }
 
-    return res.json({ Done: 'Yes' });
+    await Todo.create(req.body);
+
+    return res.json({ message: 'Created' });
   }
 }
 
