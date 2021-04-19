@@ -19,5 +19,8 @@ module.exports = {
       allowTemplateLiterals: true,
     }],
     semi: ['error', 'always'],
+    'import/extensions': ['error', 'never'],
+    'import/no-unresolved': 'off',
+    'class-methods-use-this': 'off',
   },
 };
