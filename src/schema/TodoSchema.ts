@@ -1,5 +1,12 @@
 import mongoose from 'mongoose';
 
+interface ITodo extends mongoose.Document {
+  content: String,
+  date: Date,
+  done: Boolean,
+  userId: String
+}
+
 const TodoSchema = new mongoose.Schema({
   content: {
     type: String,
@@ -19,4 +26,4 @@ const TodoSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model('todoList', TodoSchema);
+export default mongoose.model<ITodo>('todoList', TodoSchema);

@@ -6,7 +6,7 @@ interface Data {
   user: {
     userId?: string
   },
-  done: any
+  done: Boolean
 }
 
 interface Search {
@@ -22,24 +22,27 @@ class Todo {
       date: data.date,
       userId: data.user.userId,
     };
-    await TodoSchema.create(todo);
+    return TodoSchema.create(todo);
   }
 
   async getAll(byDate: string, byContent?: string, byStatus?: string) {
     const search: Search = {};
 
+    // Content Filter
     if (byContent !== undefined) {
       search.content = {
         $regex: byContent,
       };
     }
 
+    // Date Filter
     if (byDate) {
       search.date = {
         $gte: new Date(byDate),
       };
     }
 
+    // Status Filter
     switch (byStatus) {
       default:
         search.done = {
@@ -61,6 +64,20 @@ class Todo {
     }
 
     return TodoSchema.find(search);
+  }
+
+  async getOne(id: string) {
+    return TodoSchema.findById(id).exec();
+  }
+
+  async update(id: string, data: Data) {
+    const todo = {
+      content: data.content,
+      date: data.date,
+      done: data.done,
+    };
+
+    return TodoSchema.findByIdAndUpdate(id, todo);
   }
 }
 

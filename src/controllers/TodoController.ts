@@ -25,6 +25,40 @@ class TodoController {
 
     return res.json(result);
   }
+
+  async show(req: any, res: any) {
+    const result = await Todo.getOne(req.query.id);
+
+    return res.json(result);
+  }
+
+  async update(req: any, res: any) {
+    const { id } = req.query;
+
+    if (id === '') {
+      return res.status(401).json({ error: 'You must provide a post Id' });
+    }
+
+    const todo = await Todo.getOne(id);
+
+    if (todo!.userId !== req.body.user.userId) {
+      return res.status(401).json({ error: 'You are not the owner of this post' });
+    }
+
+    const schema = Yup.object().shape({
+      content: Yup.string().required(),
+      date: Yup.string().required(),
+      done: Yup.bool().required(),
+    });
+
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'You must provide: Content, Date and User Id' });
+    }
+
+    await Todo.update(id, req.body);
+
+    return res.json({ message: 'Updated' });
+  }
 }
 
 export default new TodoController();
