@@ -6,7 +6,9 @@ class TodoController {
     const schema = Yup.object().shape({
       content: Yup.string().required(),
       date: Yup.string().required(),
-      userId: Yup.number().required(),
+      user: Yup.object().shape({
+        userId: Yup.string().required(),
+      }),
     });
 
     if (!(await schema.isValid(req.body))) {

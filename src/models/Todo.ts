@@ -3,13 +3,20 @@ import TodoSchema from '../schema/TodoSchema';
 interface Data {
   content: String,
   date: Date,
-  userId: Number,
+  user: {
+    userId?: string
+  },
   done: Boolean
 }
 
 class Todo {
   async create(data: Data) {
-    await TodoSchema.create(data);
+    const todo = {
+      content: data.content,
+      date: data.date,
+      userId: data.user.userId,
+    };
+    await TodoSchema.create(todo);
   }
 }
 
