@@ -3,7 +3,8 @@ import { gql } from 'apollo-server-express';
 const typeDefs = gql`
   type Query {
     posts: [Post],
-    users: [User]
+    users: [User],
+    filterBy(content: String, date: String, done: Boolean): [Post]
   }
 
   type User {
@@ -17,13 +18,14 @@ const typeDefs = gql`
     content: String,
     date: String,
     done: Boolean,
-    userId: User
+    userId: String
   }
 
   type Mutation {
     createUser(login: String, passwordToEncode: String): User
     createPost(content: String, date: String, userId: String, done: Boolean): Post
-    deletePost(postId: ID, userId: ID): Post
+    deletePost(post: ID, user: ID): Post
+    updatePost(postId: ID, content: String, date: String, done: Boolean, userId: String): Post
   }
 `;
 
