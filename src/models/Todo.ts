@@ -79,6 +79,10 @@ class Todo {
 
     return TodoSchema.findByIdAndUpdate(id, todo);
   }
+
+  async delete(id: string) {
+    return TodoSchema.findByIdAndRemove(id);
+  }
 }
 
 export default new Todo();

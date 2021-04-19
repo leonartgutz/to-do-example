@@ -59,6 +59,24 @@ class TodoController {
 
     return res.json({ message: 'Updated' });
   }
+
+  async delete(req: any, res: any) {
+    const { id } = req.query;
+
+    if (id === '') {
+      return res.status(401).json({ error: 'You must provide a post Id' });
+    }
+
+    const todo = await Todo.getOne(id);
+
+    if (todo!.userId !== req.body.user.userId) {
+      return res.status(401).json({ error: 'You are not the owner of this post' });
+    }
+
+    await Todo.delete(id);
+
+    return res.json({ message: 'Deleted' });
+  }
 }
 
 export default new TodoController();
