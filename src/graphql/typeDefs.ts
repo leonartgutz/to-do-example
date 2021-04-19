@@ -4,7 +4,7 @@ const typeDefs = gql`
   type Query {
     posts: [Post],
     users: [User],
-    filterBy(content: String, date: String, done: Boolean): [Post]
+    filterBy(content: String, date: String, done: String): [Post]
   }
 
   type User {

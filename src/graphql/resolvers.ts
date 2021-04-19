@@ -1,4 +1,5 @@
 import bcryptjs from 'bcryptjs';
+import Todo from '../repositories/Todo';
 import TodoSchema from '../schema/TodoSchema';
 import UserSchema from '../schema/UserSchema';
 
@@ -6,16 +7,7 @@ const resolvers = {
   Query: {
     posts: () => TodoSchema.find(),
     users: () => UserSchema.find(),
-    filterBy: (_: any, { content, date, done }: any) => {
-      const search = {
-        content: {
-          $regex: content || '',
-        },
-        date: {
-          $gte: new Date(date),
-        },
-      };
-    },
+    filterBy: (_: any, args: any) => Todo.getAll(args.date, args.content, args.done),
   },
 
   Mutation: {

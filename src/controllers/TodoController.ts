@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import Todo from '../models/Todo';
+import Todo from '../repositories/Todo';
 
 class TodoController {
   async store(req: any, res: any) {
