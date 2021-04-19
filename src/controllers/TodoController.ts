@@ -19,6 +19,12 @@ class TodoController {
 
     return res.json({ message: 'Created' });
   }
+
+  async index(req: any, res: any) {
+    const result = await Todo.getAll(req.query.date, req.query.search, req.query.done);
+
+    return res.json(result);
+  }
 }
 
 export default new TodoController();

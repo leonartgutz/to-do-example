@@ -6,7 +6,13 @@ interface Data {
   user: {
     userId?: string
   },
-  done: Boolean
+  done: any
+}
+
+interface Search {
+  content?: Object,
+  date?: Object,
+  done?: Object
 }
 
 class Todo {
@@ -17,6 +23,44 @@ class Todo {
       userId: data.user.userId,
     };
     await TodoSchema.create(todo);
+  }
+
+  async getAll(byDate: string, byContent?: string, byStatus?: string) {
+    const search: Search = {};
+
+    if (byContent !== undefined) {
+      search.content = {
+        $regex: byContent,
+      };
+    }
+
+    if (byDate) {
+      search.date = {
+        $gte: new Date(byDate),
+      };
+    }
+
+    switch (byStatus) {
+      default:
+        search.done = {
+          $in: [false, true],
+        };
+        break;
+
+      case 'true':
+        search.done = {
+          $in: [true],
+        };
+        break;
+
+      case 'false':
+        search.done = {
+          $in: [false],
+        };
+        break;
+    }
+
+    return TodoSchema.find(search);
   }
 }
 

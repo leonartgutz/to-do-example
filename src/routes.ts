@@ -7,6 +7,7 @@ import authMiddleware from './middlewares/authMiddleware';
 const routes = Router();
 
 routes.post('/create-post', authMiddleware, TodoController.store);
+routes.get('/get-posts', TodoController.index);
 
 routes.post('/create-user', UserController.store);
 
