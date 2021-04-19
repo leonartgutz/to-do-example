@@ -12,31 +12,24 @@ const resolvers = {
 
   Mutation: {
     createPost: async (_: any, { content, date, userId }: any) => {
-      const result = await TodoSchema.create({ content, date, userId });
+      const result = await Todo.create({ content, date, userId });
       return result;
     },
 
     deletePost: async (_: any, { post, user }: any) => {
-      const removedPost = await TodoSchema.findById(post);
+      const checkOwnership = await Todo.getOne(post);
 
-      if (!removedPost) {
+      if (!checkOwnership) {
         return 'Not Found';
       }
 
-      if (removedPost.userId !== user) {
+      if (checkOwnership.userId.toString() !== user) {
         return 'You are not the owner of this post';
       }
 
-      await TodoSchema.findByIdAndDelete(post);
+      await Todo.delete(post);
 
-      return removedPost;
-    },
-
-    createUser: async (_: any, { login, passwordToEncode }: any) => {
-      const password = await bcryptjs.hash(passwordToEncode, 8);
-      const result = await UserSchema.create({ login, password });
-
-      return result;
+      return 'Post Deleted';
     },
 
     updatePost: async (_: any, {
@@ -46,10 +39,26 @@ const resolvers = {
         content,
         date,
         done,
-        userId,
       };
 
-      const result = await TodoSchema.findByIdAndUpdate(postId, todo);
+      const checkOwnership = await Todo.getOne(postId);
+
+      if (!checkOwnership) {
+        return 'Not Found';
+      }
+
+      if (checkOwnership.userId.toString() !== userId) {
+        return 'You are not the owner of this post';
+      }
+
+      await Todo.update(postId, todo);
+
+      return 'Post Updated';
+    },
+
+    createUser: async (_: any, { login, passwordToEncode }: any) => {
+      const password = await bcryptjs.hash(passwordToEncode, 8);
+      const result = await UserSchema.create({ login, password });
 
       return result;
     },

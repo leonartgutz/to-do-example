@@ -1,14 +1,5 @@
 import TodoSchema from '../schema/TodoSchema';
 
-interface Data {
-  content: String,
-  date: Date,
-  user: {
-    userId?: string
-  },
-  done: Boolean
-}
-
 interface Search {
   content?: Object,
   date?: Object,
@@ -16,11 +7,11 @@ interface Search {
 }
 
 class Todo {
-  async create(data: Data) {
+  async create(data: any) {
     const todo = {
       content: data.content,
       date: data.date,
-      userId: data.user.userId,
+      userId: data.userId,
     };
     return TodoSchema.create(todo);
   }
@@ -70,12 +61,18 @@ class Todo {
     return TodoSchema.findById(id).exec();
   }
 
-  async update(id: string, data: Data) {
-    const todo = {
-      content: data.content,
-      date: data.date,
+  async update(id: string, data: any) {
+    const todo: any = {
       done: data.done,
     };
+
+    if (data.content) {
+      todo.content = data.content;
+    }
+
+    if (data.date) {
+      todo.content = data.date;
+    }
 
     return TodoSchema.findByIdAndUpdate(id, todo);
   }

@@ -6,9 +6,7 @@ class TodoController {
     const schema = Yup.object().shape({
       content: Yup.string().required(),
       date: Yup.string().required(),
-      user: Yup.object().shape({
-        userId: Yup.string().required(),
-      }),
+      userId: Yup.string().required(),
     });
 
     if (!(await schema.isValid(req.body))) {
@@ -41,7 +39,7 @@ class TodoController {
 
     const todo = await Todo.getOne(id);
 
-    if (todo!.userId !== req.body.user.userId) {
+    if (todo!.userId.toString() !== req.body.userId) {
       return res.status(401).json({ error: 'You are not the owner of this post' });
     }
 
@@ -69,7 +67,7 @@ class TodoController {
 
     const todo = await Todo.getOne(id);
 
-    if (todo!.userId !== req.body.user.userId) {
+    if (todo!.userId.toString() !== req.body.userId) {
       return res.status(401).json({ error: 'You are not the owner of this post' });
     }
 
