@@ -7,6 +7,8 @@ interface Data {
 }
 
 class User {
+  password = '';
+
   async create(data: Data) {
     const userInfo = {
       login: data.login,
@@ -22,6 +24,14 @@ class User {
     }
 
     return false;
+  }
+
+  findOne(data: Data) {
+    return UserSchema.findOne({ login: data.login }).exec();
+  }
+
+  checkPassword(password: string, hash: string) {
+    return bcryptjs.compareSync(password, hash);
   }
 }
 
