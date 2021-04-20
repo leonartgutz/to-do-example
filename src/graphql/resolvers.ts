@@ -1,12 +1,11 @@
-import bcryptjs from 'bcryptjs';
 import Todo from '../repositories/Todo';
-import TodoSchema from '../schema/TodoSchema';
-import UserSchema from '../schema/UserSchema';
+import User from '../repositories/User';
+import tokenGeneration from '../utils/tokenGeneration';
 
 const resolvers = {
   Query: {
-    posts: () => TodoSchema.find(),
-    users: () => UserSchema.find(),
+    posts: () => Todo.getAll(),
+    users: () => User.getAll(),
     filterBy: (_: any, args: any) => Todo.getAll(args.date, args.content, args.done),
   },
 
@@ -56,11 +55,23 @@ const resolvers = {
       return 'Post Updated';
     },
 
-    createUser: async (_: any, { login, passwordToEncode }: any) => {
-      const password = await bcryptjs.hash(passwordToEncode, 8);
-      const result = await UserSchema.create({ login, password });
+    createUser: async (_: any, { login, password }: any) => {
+      await User.create({ login, password });
+      return 'User Created';
+    },
 
-      return result;
+    loginUser: async (_: any, { login, password }: any) => {
+      const checkUser = await User.findOne({ login, password });
+
+      if (!checkUser) {
+        throw new Error('User not found');
+      }
+
+      if (!(User.checkPassword(password, checkUser!.password))) {
+        throw new Error('Password does not');
+      }
+
+      return tokenGeneration(checkUser.id, checkUser.login);
     },
   },
 };

@@ -26,6 +26,10 @@ class User {
     return false;
   }
 
+  async getAll() {
+    return UserSchema.find();
+  }
+
   findOne(data: Data) {
     return UserSchema.findOne({ login: data.login }).exec();
   }

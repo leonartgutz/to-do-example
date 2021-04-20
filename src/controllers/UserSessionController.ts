@@ -1,7 +1,6 @@
 import * as Yup from 'yup';
-import jwt from 'jsonwebtoken';
 import User from '../repositories/User';
-import authConfig from '../config/token';
+import tokenGeneration from '../utils/tokenGeneration';
 
 class UserSessionController {
   async store(req: any, res: any) {
@@ -30,15 +29,7 @@ class UserSessionController {
       return res.status(401).json({ error: 'Password does not match' });
     }
 
-    return res.json({
-      userInfo: {
-        userId: user.id,
-        login: user.login,
-      },
-      token: jwt.sign({ userId: user.id }, authConfig.secret, {
-        expiresIn: authConfig.expiresIn,
-      }),
-    });
+    return res.json(tokenGeneration(user.id, user.login));
   }
 }
 

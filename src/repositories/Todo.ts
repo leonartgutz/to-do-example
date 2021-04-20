@@ -16,7 +16,7 @@ class Todo {
     return TodoSchema.create(todo);
   }
 
-  async getAll(byDate: string, byContent?: string, byStatus?: string) {
+  async getAll(byDate?: string, byContent?: string, byStatus?: string) {
     const search: Search = {};
 
     // Content Filter
