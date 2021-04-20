@@ -71,7 +71,7 @@ class Todo {
     }
 
     if (data.date) {
-      todo.content = data.date;
+      todo.date = data.date;
     }
 
     return TodoSchema.findByIdAndUpdate(id, todo);
