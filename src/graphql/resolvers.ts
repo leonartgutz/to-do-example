@@ -1,8 +1,7 @@
-import jwt from 'jsonwebtoken';
 import Todo from '../repositories/Todo';
 import User from '../repositories/User';
+import tokenDecode from '../utils/tokenDecode';
 import tokenGeneration from '../utils/tokenGeneration';
-import authConfig from '../config/token';
 
 const resolvers = {
   Query: {
@@ -14,23 +13,23 @@ const resolvers = {
   Mutation: {
     // Create Post Mutation
     createPost: async (_: any, { content, date }: any, { req }: any) => {
-      const auth: any = jwt.verify(req.cookies['graph-cookie'], authConfig.secret);
-
-      const { userId } = auth;
+      const userId = tokenDecode(req.cookies);
 
       const result = await Todo.create({ content, date, userId });
       return result;
     },
 
     // Delete Post Mutation
-    deletePost: async (_: any, { post, user }: any, { req }: any) => {
+    deletePost: async (_: any, { post }: any, { req }: any) => {
+      const userId = tokenDecode(req.cookies);
+
       const checkOwnership = await Todo.getOne(post);
 
       if (!checkOwnership) {
         return 'Not Found';
       }
 
-      if (checkOwnership.userId.toString() !== user) {
+      if (checkOwnership.userId.toString() !== userId) {
         return 'You are not the owner of this post';
       }
 
@@ -41,8 +40,10 @@ const resolvers = {
 
     // Update Post Mutation
     updatePost: async (_: any, {
-      postId, content, date, done, userId,
-    }: any) => {
+      postId, content, date, done,
+    }: any, { req }: any) => {
+      const userId = tokenDecode(req.cookies);
+
       const todo = {
         content,
         date,
