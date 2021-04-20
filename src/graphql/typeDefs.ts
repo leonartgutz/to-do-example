@@ -28,7 +28,7 @@ const typeDefs = gql`
   type Mutation {
     createUser(login: String, password: String): String
     loginUser(login: String!, password: String!): Session
-    createPost(content: String!, date: String!, userId: String!, done: Boolean): Post
+    createPost(content: String!, date: String!, done: Boolean): Post
     deletePost(post: ID!, user: ID!): String
     updatePost(postId: ID!, content: String, date: String, done: Boolean!, userId: String!): String
   }

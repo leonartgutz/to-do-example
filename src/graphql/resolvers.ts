@@ -1,6 +1,8 @@
+import jwt from 'jsonwebtoken';
 import Todo from '../repositories/Todo';
 import User from '../repositories/User';
 import tokenGeneration from '../utils/tokenGeneration';
+import authConfig from '../config/token';
 
 const resolvers = {
   Query: {
@@ -10,12 +12,18 @@ const resolvers = {
   },
 
   Mutation: {
-    createPost: async (_: any, { content, date, userId }: any) => {
+    // Create Post Mutation
+    createPost: async (_: any, { content, date }: any, { req }: any) => {
+      const auth: any = jwt.verify(req.cookies['graph-cookie'], authConfig.secret);
+
+      const { userId } = auth;
+
       const result = await Todo.create({ content, date, userId });
       return result;
     },
 
-    deletePost: async (_: any, { post, user }: any) => {
+    // Delete Post Mutation
+    deletePost: async (_: any, { post, user }: any, { req }: any) => {
       const checkOwnership = await Todo.getOne(post);
 
       if (!checkOwnership) {
@@ -31,6 +39,7 @@ const resolvers = {
       return 'Post Deleted';
     },
 
+    // Update Post Mutation
     updatePost: async (_: any, {
       postId, content, date, done, userId,
     }: any) => {
@@ -55,12 +64,14 @@ const resolvers = {
       return 'Post Updated';
     },
 
+    // Create User Mutation
     createUser: async (_: any, { login, password }: any) => {
       await User.create({ login, password });
       return 'User Created';
     },
 
-    loginUser: async (_: any, { login, password }: any) => {
+    // Login Mutation
+    loginUser: async (_: any, { login, password }: any, { res }: any) => {
       const checkUser = await User.findOne({ login, password });
 
       if (!checkUser) {
@@ -68,10 +79,14 @@ const resolvers = {
       }
 
       if (!(User.checkPassword(password, checkUser!.password))) {
-        throw new Error('Password does not');
+        throw new Error('Password does not match');
       }
 
-      return tokenGeneration(checkUser.id, checkUser.login);
+      const getToken: any = tokenGeneration(checkUser.id, checkUser.login);
+
+      res.cookie('graph-cookie', getToken.token);
+
+      return getToken;
     },
   },
 };

@@ -6,6 +6,7 @@ import resolvers from './graphql/resolvers';
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  context: ({ req, res }: any) => ({ req, res }),
 });
 
 server.applyMiddleware({ app });
