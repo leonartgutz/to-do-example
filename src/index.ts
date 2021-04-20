@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import express, { json } from 'express';
 import mongoose from 'mongoose';
 import routes from './routes';
@@ -14,6 +15,7 @@ class App {
 
   middlewares() {
     this.server.use(json());
+    this.server.use(cookieParser());
   }
 
   routes() {
