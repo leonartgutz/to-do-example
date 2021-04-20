@@ -11,7 +11,9 @@ export default async (req: any, res: any, next: any) => {
   const [, token] = authHeader.split(' ');
 
   try {
-    req.body.user = jwt.verify(token, authConfig.secret);
+    jwt.verify(token, authConfig.secret, {}, (_: any, decoded: any) => {
+      req.body.userId = decoded.userId;
+    });
 
     return next();
   } catch (err) {

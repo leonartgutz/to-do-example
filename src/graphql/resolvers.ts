@@ -1,50 +1,34 @@
-import bcryptjs from 'bcryptjs';
-import TodoSchema from '../schema/TodoSchema';
-import UserSchema from '../schema/UserSchema';
+import Todo from '../repositories/Todo';
+import User from '../repositories/User';
+import tokenGeneration from '../utils/tokenGeneration';
 
 const resolvers = {
   Query: {
-    posts: () => TodoSchema.find(),
-    users: () => UserSchema.find(),
-    filterBy: (_: any, { content, date, done }: any) => {
-      const search = {
-        content: {
-          $regex: content || '',
-        },
-        date: {
-          $gte: new Date(date),
-        },
-      };
-    },
+    posts: () => Todo.getAll(),
+    users: () => User.getAll(),
+    filterBy: (_: any, args: any) => Todo.getAll(args.date, args.content, args.done),
   },
 
   Mutation: {
     createPost: async (_: any, { content, date, userId }: any) => {
-      const result = await TodoSchema.create({ content, date, userId });
+      const result = await Todo.create({ content, date, userId });
       return result;
     },
 
     deletePost: async (_: any, { post, user }: any) => {
-      const removedPost = await TodoSchema.findById(post);
+      const checkOwnership = await Todo.getOne(post);
 
-      if (!removedPost) {
+      if (!checkOwnership) {
         return 'Not Found';
       }
 
-      if (removedPost.userId !== user) {
+      if (checkOwnership.userId.toString() !== user) {
         return 'You are not the owner of this post';
       }
 
-      await TodoSchema.findByIdAndDelete(post);
+      await Todo.delete(post);
 
-      return removedPost;
-    },
-
-    createUser: async (_: any, { login, passwordToEncode }: any) => {
-      const password = await bcryptjs.hash(passwordToEncode, 8);
-      const result = await UserSchema.create({ login, password });
-
-      return result;
+      return 'Post Deleted';
     },
 
     updatePost: async (_: any, {
@@ -54,12 +38,40 @@ const resolvers = {
         content,
         date,
         done,
-        userId,
       };
 
-      const result = await TodoSchema.findByIdAndUpdate(postId, todo);
+      const checkOwnership = await Todo.getOne(postId);
 
-      return result;
+      if (!checkOwnership) {
+        return 'Not Found';
+      }
+
+      if (checkOwnership.userId.toString() !== userId) {
+        return 'You are not the owner of this post';
+      }
+
+      await Todo.update(postId, todo);
+
+      return 'Post Updated';
+    },
+
+    createUser: async (_: any, { login, password }: any) => {
+      await User.create({ login, password });
+      return 'User Created';
+    },
+
+    loginUser: async (_: any, { login, password }: any) => {
+      const checkUser = await User.findOne({ login, password });
+
+      if (!checkUser) {
+        throw new Error('User not found');
+      }
+
+      if (!(User.checkPassword(password, checkUser!.password))) {
+        throw new Error('Password does not');
+      }
+
+      return tokenGeneration(checkUser.id, checkUser.login);
     },
   },
 };
