@@ -6,12 +6,12 @@ import authMiddleware from './middlewares/authMiddleware';
 
 const routes = Router();
 
-routes.post('/create-post', authMiddleware, TodoController.store);
-routes.get('/get-posts', TodoController.index);
-routes.put('/update-post', authMiddleware, TodoController.update);
-routes.delete('/delete-post', authMiddleware, TodoController.delete);
+routes.post('/post', authMiddleware, TodoController.store);
+routes.get('/posts', TodoController.index);
+routes.put('/post', authMiddleware, TodoController.update);
+routes.delete('/post', authMiddleware, TodoController.delete);
 
-routes.post('/create-user', UserController.store);
+routes.post('/user', UserController.store);
 
 routes.post('/login', UserSessionController.store);
 
